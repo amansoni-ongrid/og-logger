@@ -1,0 +1,71 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "og-logger"
+version = "0.1.0"
+description = "Structured JSON logging with async-safe request context for FastAPI/Starlette"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.9"
+authors = [
+    { name = "Your Name", email = "you@example.com" }
+]
+keywords = [
+    "logging",
+    "loguru",
+    "fastapi",
+    "starlette",
+    "json",
+    "ecs",
+    "structured-logging",
+    "request-context",
+    "middleware",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Framework :: FastAPI",
+    "Topic :: System :: Logging",
+    "Typing :: Typed",
+]
+
+dependencies = [
+    "loguru>=0.7.0",
+]
+
+[project.optional-dependencies]
+middleware = [
+    "starlette>=0.20.0",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.24.0",
+    "fastapi>=0.100.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/og-logger"
+Documentation = "https://github.com/yourusername/og-logger#readme"
+Repository = "https://github.com/yourusername/og-logger"
+Issues = "https://github.com/yourusername/og-logger/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "*.py",
+    "README.md",
+    "LICENSE",
+    "py.typed",
+]
