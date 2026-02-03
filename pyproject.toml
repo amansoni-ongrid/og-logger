@@ -10,7 +10,7 @@ readme = "README.md"
 license = "MIT"
 requires-python = ">=3.9"
 authors = [
-    { name = "Your Name", email = "you@example.com" }
+    { name = "Aman Soni", email = "aman.soni@ongrid.in" }
 ]
 keywords = [
     "logging",
@@ -54,10 +54,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/og-logger"
-Documentation = "https://github.com/yourusername/og-logger#readme"
-Repository = "https://github.com/yourusername/og-logger"
-Issues = "https://github.com/yourusername/og-logger/issues"
+Homepage = "https://github.com/amansoni-ongrid/og-logger"
+Documentation = "https://github.com/amansoni-ongrid/og-logger#readme"
+Repository = "https://github.com/amansoni-ongrid/og-logger"
+Issues = "https://github.com/amansoni-ongrid/og-logger/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["."]
