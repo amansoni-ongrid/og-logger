@@ -164,7 +164,7 @@ def setup_logger(
             None (default): Auto-detect based on ENVIRONMENT:
                 * "production"/"staging" → JSON
                 * "development" → Colored console
-              Can also be forced via JSON_LOGS=true env var.
+                Can also be forced via JSON_LOGS=true env var.
         
         log_output: Where to send logs - "stdout", "file", or "both".
             Default: "stdout" in production (safer for multi-worker), "both" in development.

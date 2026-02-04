@@ -13,6 +13,7 @@ Usage:
         include_query_params=True,
         include_payload=True,
         payload_max_chars=100,
+        enable_memory_monitor=True,  # Track memory consumption per request
     )
 """
 import time
@@ -25,6 +26,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from .context import set_request_context, clear_request_context
 from .instances import logger
+from .memory import start_memory_tracking, stop_memory_tracking
 
 
 # =============================================================================
@@ -70,10 +72,14 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     Args:
         app: The ASGI application
         context_fields: List of field names to extract from query params/payload
-                       and add to log context for tracing (e.g., ["process_id", "user_id"])
+                        and add to log context for tracing (e.g., ["process_id", "user_id"])
         include_query_params: Whether to log query params in request logs
         include_payload: Whether to log request payload in request logs
         payload_max_chars: Maximum characters to log from payload (truncates with "...")
+        enable_memory_monitor: Whether to track memory consumption per request.
+                                When enabled, each log includes memory.allocated_mb,
+                                memory.peak_mb, and memory.current_mb fields.
+                                Note: Adds ~5-10% overhead due to tracemalloc.
     
     Example:
         app.add_middleware(
@@ -82,6 +88,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             include_query_params=True,
             include_payload=True,
             payload_max_chars=100,
+            enable_memory_monitor=True,
         )
     """
     
@@ -92,18 +99,24 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         include_query_params: bool = True,
         include_payload: bool = True,
         payload_max_chars: int = 100,
+        enable_memory_monitor: bool = False,
     ):
         super().__init__(app)
         self.context_fields = context_fields or []
         self.include_query_params = include_query_params
         self.include_payload = include_payload
         self.payload_max_chars = payload_max_chars
+        self.enable_memory_monitor = enable_memory_monitor
 
     async def dispatch(self, request: Request, call_next):
         request_id = uuid.uuid4().hex[:8]
         client_ip = _get_client_ip(request)
         method = request.method
         path = request.url.path
+
+        # Start memory tracking if enabled
+        if self.enable_memory_monitor:
+            start_memory_tracking()
 
         # Parse query params
         query_params = dict(request.query_params) if request.query_params else {}
@@ -147,7 +160,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             duration_ms = (time.time() - start_time) * 1000
 
-            # Log response with appropriate level
+            # Build response log extras
             resp_extras = {
                 "event_type": "request_end",
                 "http.method": method,
@@ -155,6 +168,12 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                 "http.status_code": response.status_code,
                 "duration_ms": round(duration_ms, 2),
             }
+            
+            # Add final memory metrics to response log
+            if self.enable_memory_monitor:
+                memory_metrics = stop_memory_tracking()
+                resp_extras.update(memory_metrics)
+            
             msg = f"⬅️  {response.status_code} in {duration_ms:.0f}ms"
             
             if response.status_code >= 500:
@@ -167,5 +186,8 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             response.headers["x-request-id"] = request_id
             return response
         finally:
+            # Ensure memory tracking is stopped even on error
+            if self.enable_memory_monitor:
+                stop_memory_tracking()
             clear_request_context()
 

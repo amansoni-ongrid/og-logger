@@ -8,16 +8,75 @@ Structured JSON logging with async-safe request context for FastAPI/Starlette ap
 - **Colored console output** for development
 - **Async-safe request context** using `contextvars` - automatically includes `request_id`, `client_ip`, and custom fields in all logs
 - **Configurable middleware** for FastAPI/Starlette with request/response logging
+- **Memory monitoring** - optional per-request memory consumption tracking with peak usage
 - **Automatic log rotation** by size and time
 - **Zero configuration required** - sensible defaults with environment variable overrides
 
 ## Installation
 
-```bash
-pip install og-logger
+This is a private package. Make sure you have access to the repository.
 
-# With middleware support (for FastAPI/Starlette)
-pip install og-logger[middleware]
+### Using pip
+
+```bash
+# Install latest from main branch
+pip install git+https://github.com/amansoni-ongrid/og-logger.git
+
+# Install specific version (recommended)
+pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0
+
+# With middleware support
+pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0"
+```
+
+### Using uv
+
+```bash
+# Install latest from main branch
+uv pip install git+https://github.com/amansoni-ongrid/og-logger.git
+
+# Install specific version (recommended)
+uv pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0
+
+# With middleware support
+uv pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0"
+```
+
+### In pyproject.toml (for uv sync / pip install)
+
+Add to your project's `pyproject.toml`:
+
+```toml
+[project]
+dependencies = [
+    "og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0",
+]
+
+# Or with middleware extra:
+# "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0",
+```
+
+Then run:
+
+```bash
+# With uv
+uv sync
+
+# With pip
+pip install -e .
+```
+
+### In requirements.txt
+
+```
+og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0
+```
+
+### Using SSH (if you have SSH keys configured)
+
+```bash
+pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.0
+uv pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.0
 ```
 
 ## Quick Start
@@ -65,6 +124,7 @@ app.add_middleware(
     include_query_params=True,
     include_payload=True,
     payload_max_chars=100,
+    enable_memory_monitor=True,  # Track memory per request
 )
 
 @app.get("/orders/{order_id}")
@@ -142,6 +202,63 @@ In production with multiple workers/containers:
 logger = setup_logger(log_output="stdout", json_output=True)
 ```
 
+## Memory Monitoring
+
+Track memory consumption per API request by enabling the `enable_memory_monitor` flag:
+
+```python
+app.add_middleware(
+    RequestLoggingMiddleware,
+    enable_memory_monitor=True,
+)
+```
+
+When enabled, every log during a request includes:
+
+| Field | Description |
+|-------|-------------|
+| `memory.allocated_mb` | Memory allocated since request started |
+| `memory.peak_mb` | Peak memory usage during the request |
+| `memory.current_mb` | Current memory snapshot |
+
+### Example Output (JSON)
+
+```json
+{
+  "@timestamp": "2026-02-03T10:30:00.000Z",
+  "log.level": "INFO",
+  "message": "⬅️  200 in 45ms",
+  "request.id": "abc123",
+  "http.status_code": 200,
+  "duration_ms": 45.23,
+  "memory.allocated_mb": 2.451,
+  "memory.peak_mb": 3.892,
+  "memory.current_mb": 15.234
+}
+```
+
+### Manual Memory Tracking
+
+For custom use cases outside the middleware:
+
+```python
+from og_logger import start_memory_tracking, stop_memory_tracking, get_memory_context
+
+# Start tracking
+start_memory_tracking()
+
+# ... your code ...
+logger.info("Processing", **get_memory_context())  # Include current memory in log
+
+# Stop and get final metrics
+metrics = stop_memory_tracking()
+# {'memory.allocated_mb': 1.234, 'memory.peak_mb': 2.345, 'memory.current_mb': 10.567}
+```
+
+### Performance Note
+
+Memory monitoring uses Python's `tracemalloc` module which adds approximately 5-10% overhead. Consider enabling it only when needed (debugging, profiling, specific endpoints) rather than globally in high-throughput production environments.
+
 ## API Reference
 
 ### `setup_logger(**kwargs)`
@@ -161,6 +278,18 @@ Get current context as a dictionary.
 
 ### `RequestLoggingMiddleware`
 Starlette/FastAPI middleware for automatic request/response logging.
+
+### `start_memory_tracking()`
+Start memory tracking for the current request/context.
+
+### `stop_memory_tracking()`
+Stop tracking and return final memory metrics as a dict.
+
+### `get_memory_context()`
+Get current memory metrics for inclusion in logs.
+
+### `is_memory_monitoring_enabled()`
+Check if memory monitoring is active for the current context.
 
 ## License
 

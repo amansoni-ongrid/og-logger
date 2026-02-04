@@ -70,8 +70,12 @@ def get_context() -> dict:
     Get current request context as a dictionary.
     
     Used internally by formatters to include context in every log message.
-    Returns all context variables merged into a single dict.
+    Returns all context variables merged into a single dict, including
+    memory metrics if memory monitoring is enabled.
     """
+    from .memory import get_memory_context
+    
     ctx = {"request.id": request_id_ctx.get(), "client.ip": client_ip_ctx.get()}
     ctx.update(extra_ctx.get())  # Add any extra fields (process_id, folder_id, etc.)
+    ctx.update(get_memory_context())  # Add memory metrics if enabled
     return ctx
