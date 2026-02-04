@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "og-logger"
-version = "0.1.1"
+version = "0.1.2"
 description = "Structured JSON logging with async-safe request context for FastAPI/Starlette"
 readme = "README.md"
 license = {text = "Proprietary"}
@@ -41,6 +41,7 @@ classifiers = [
 
 dependencies = [
     "loguru>=0.7.0",
+    "filelock>=3.0.0",
 ]
 
 [project.optional-dependencies]

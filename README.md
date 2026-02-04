@@ -214,15 +214,24 @@ logger = setup_logger(
 
 ## Multi-Worker / Container Deployments
 
-**Important**: File logging is NOT safe when multiple processes write to the same file.
+File logging is **multi-worker safe** and **async-safe**:
 
-In production with multiple workers/containers:
-1. Set `LOG_OUTPUT=stdout`
-2. Let Docker/Kubernetes handle log aggregation
-3. Forward to ELK, Loki, CloudWatch, etc.
+- **Non-blocking**: Log calls just enqueue messages (won't block your async event loop)
+- **Process-safe**: Background thread uses file locking for multi-worker writes
+- **Safe shutdown**: `atexit` handler flushes remaining messages before exit
 
 ```python
-# Production config
+# Works safely with multiple workers and async code
+logger = setup_logger(log_output="both", json_output=True)
+```
+
+For high-throughput production environments, stdout-only logging is still recommended:
+1. Avoids file I/O entirely
+2. Docker/Kubernetes handle log aggregation natively
+3. Easier to forward to ELK, Loki, CloudWatch, etc.
+
+```python
+# Recommended for high-throughput production
 logger = setup_logger(log_output="stdout", json_output=True)
 ```
 
