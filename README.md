@@ -23,10 +23,10 @@ This is a private package. Make sure you have access to the repository.
 pip install git+https://github.com/amansoni-ongrid/og-logger.git
 
 # Install specific version (recommended)
-pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0
+pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1
 
 # With middleware support
-pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0"
+pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1"
 ```
 
 ### Using uv
@@ -36,10 +36,10 @@ pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-l
 uv pip install git+https://github.com/amansoni-ongrid/og-logger.git
 
 # Install specific version (recommended)
-uv pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0
+uv pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1
 
 # With middleware support
-uv pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0"
+uv pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1"
 ```
 
 ### In pyproject.toml (for uv sync / pip install)
@@ -49,11 +49,11 @@ Add to your project's `pyproject.toml`:
 ```toml
 [project]
 dependencies = [
-    "og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0",
+    "og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1",
 ]
 
 # Or with middleware extra:
-# "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0",
+# "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1",
 ```
 
 Then run:
@@ -69,14 +69,38 @@ pip install -e .
 ### In requirements.txt
 
 ```
-og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.0
+og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1
 ```
 
 ### Using SSH (if you have SSH keys configured)
 
 ```bash
-pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.0
-uv pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.0
+pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.1
+uv pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.1
+```
+
+### Upgrading to Latest Version
+
+```bash
+# With pip (use --upgrade or -U flag)
+pip install --upgrade git+https://github.com/amansoni-ongrid/og-logger.git
+
+# With uv
+uv pip install --upgrade git+https://github.com/amansoni-ongrid/og-logger.git
+
+# Or reinstall to force update
+pip install --force-reinstall git+https://github.com/amansoni-ongrid/og-logger.git
+uv pip install --reinstall git+https://github.com/amansoni-ongrid/og-logger.git
+```
+
+If you're using `pyproject.toml` or `requirements.txt`, update the version tag and run:
+
+```bash
+# With uv
+uv sync --upgrade-package og-logger
+
+# With pip
+pip install --upgrade -e .
 ```
 
 ## Quick Start
@@ -261,6 +285,12 @@ Memory monitoring uses Python's `tracemalloc` module which adds approximately 5-
 
 ## API Reference
 
+### `__version__`
+The current package version string (e.g., `"0.1.0"`).
+
+### `logger`
+Pre-configured logger instance (lazy-initialized on first use). Use this for quick access without calling `setup_logger()`.
+
 ### `setup_logger(**kwargs)`
 Configure and return the loguru logger instance.
 
@@ -293,4 +323,4 @@ Check if memory monitoring is active for the current context.
 
 ## License
 
-MIT
+Proprietary - OnGrid internal use only. See [LICENSE](LICENSE) for details.

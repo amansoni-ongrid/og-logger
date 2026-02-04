@@ -4,10 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "og-logger"
-version = "0.1.0"
+version = "0.1.1"
 description = "Structured JSON logging with async-safe request context for FastAPI/Starlette"
 readme = "README.md"
-license = "MIT"
+license = {text = "Proprietary"}
 requires-python = ">=3.9"
 authors = [
     { name = "Aman Soni", email = "aman.soni@ongrid.in" }
@@ -26,7 +26,7 @@ keywords = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
+    "License :: Other/Proprietary License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
@@ -36,6 +36,7 @@ classifiers = [
     "Framework :: FastAPI",
     "Topic :: System :: Logging",
     "Typing :: Typed",
+    "Private :: Do Not Upload",
 ]
 
 dependencies = [

@@ -47,7 +47,7 @@ Memory Monitoring:
     Note: Memory monitoring uses tracemalloc and adds ~5-10% overhead.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 from .context import set_request_context, clear_request_context, get_context
 from .setup import setup_logger
