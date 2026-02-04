@@ -60,12 +60,16 @@ Repository = "https://github.com/amansoni-ongrid/og-logger"
 Issues = "https://github.com/amansoni-ongrid/og-logger/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
+packages = ["og_logger"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "*.py",
+    "og_logger/*.py",
+    "og_logger/py.typed",
+    "tests/*.py",
     "README.md",
     "LICENSE",
-    "py.typed",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
