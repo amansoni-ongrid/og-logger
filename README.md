@@ -7,9 +7,12 @@ Structured JSON logging with async-safe request context for FastAPI/Starlette ap
 - **ECS-compatible JSON output** for production (works with ELK, Loki, CloudWatch)
 - **Colored console output** for development
 - **Async-safe request context** using `contextvars` - automatically includes `request_id`, `client_ip`, and custom fields in all logs
+- **Async-safe file logging** - non-blocking writes via background thread (won't block your event loop)
+- **Multi-worker safe** - file locking ensures safe writes from multiple Gunicorn/uvicorn workers
+- **Container-friendly** - SIGTERM handling for graceful shutdown in Docker/Kubernetes
 - **Configurable middleware** for FastAPI/Starlette with request/response logging
 - **Memory monitoring** - optional per-request memory consumption tracking with peak usage
-- **Automatic log rotation** by size and time
+- **Automatic log rotation** by file size with configurable retention (days/hours/weeks/files)
 - **Zero configuration required** - sensible defaults with environment variable overrides
 
 ## Installation
@@ -23,10 +26,10 @@ This is a private package. Make sure you have access to the repository.
 pip install git+https://github.com/amansoni-ongrid/og-logger.git
 
 # Install specific version (recommended)
-pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1
+pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.2
 
 # With middleware support
-pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1"
+pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.2"
 ```
 
 ### Using uv
@@ -36,10 +39,10 @@ pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-l
 uv pip install git+https://github.com/amansoni-ongrid/og-logger.git
 
 # Install specific version (recommended)
-uv pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1
+uv pip install git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.2
 
 # With middleware support
-uv pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1"
+uv pip install "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.2"
 ```
 
 ### In pyproject.toml (for uv sync / pip install)
@@ -49,11 +52,11 @@ Add to your project's `pyproject.toml`:
 ```toml
 [project]
 dependencies = [
-    "og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1",
+    "og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.2",
 ]
 
 # Or with middleware extra:
-# "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1",
+# "og-logger[middleware] @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.2",
 ```
 
 Then run:
@@ -69,14 +72,14 @@ pip install -e .
 ### In requirements.txt
 
 ```
-og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.1
+og-logger @ git+https://github.com/amansoni-ongrid/og-logger.git@v0.1.2
 ```
 
 ### Using SSH (if you have SSH keys configured)
 
 ```bash
-pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.1
-uv pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.1
+pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.2
+uv pip install git+ssh://git@github.com/amansoni-ongrid/og-logger.git@v0.1.2
 ```
 
 ### Upgrading to Latest Version
@@ -295,7 +298,7 @@ Memory monitoring uses Python's `tracemalloc` module which adds approximately 5-
 ## API Reference
 
 ### `__version__`
-The current package version string (e.g., `"0.1.0"`).
+The current package version string (e.g., `"0.1.2"`).
 
 ### `logger`
 Pre-configured logger instance (lazy-initialized on first use). Use this for quick access without calling `setup_logger()`.
